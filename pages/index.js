@@ -26,12 +26,20 @@ export default function PaginaInicial() {
     useEffect(() => {
 
         fetch(`https://api.github.com/users/${username}`)
-            .then((resposta) => resposta.json())
-            .then(function (respostaCompleta) {
-                const local = respostaCompleta.location
+            .then(async (resposta) => {
+                let dados = await resposta.json()
+                const local = dados.location
                 setLocal(local)
             })
     })
+
+    function usernameValido(usuario) {
+
+        if (usuario.length > 2) {
+
+            return usuario
+        }
+    }
 
     return (
         <>
@@ -63,14 +71,14 @@ export default function PaginaInicial() {
                         as="form"
                         onSubmit={(event) => {
                             event.preventDefault()
-                            if(username.length > 1)rota.push('/chat')
+                            if (usernameValido(username)) rota.push('/chat')
                         }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
-                        <Titulo tag="h2">{username.length <= 1 ? `bem vindo ao Aluracord!` : `Bem vindo, ${username} !`}</Titulo>
+                        <Titulo tag="h2">{!usernameValido(username) ? `bem vindo ao Aluracord!` : `Bem vindo, ${username} !`}</Titulo>
                         <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
                             {appConfig.name}
                         </Text>
@@ -91,10 +99,11 @@ export default function PaginaInicial() {
                                 },
                             }}
                         />
-                        {username.length <= 1
+                        {!usernameValido(username)
                             ? <span>Preencha o campo com um usuário válido</span>
                             : ''}
                         <Button
+                            disabled={!usernameValido(username)}
                             placeholder="olá"
                             type='submit'
                             label='Entrar'
@@ -131,7 +140,7 @@ export default function PaginaInicial() {
                                 borderRadius: '50%',
                                 marginBottom: '16px',
                             }}
-                            src={username.length <= 1 || !`https://github.com/${username}.png` ?
+                            src={!usernameValido(username) ?
                                 "https://st3.depositphotos.com/4111759/13425/v/600/depositphotos_134255634-stock-illustration-avatar-icon-male-profile-gray.jpg" :
                                 `https://github.com/${username}.png`
 
@@ -147,7 +156,7 @@ export default function PaginaInicial() {
                                 borderRadius: '1000px'
                             }}
                         >
-                            {username}
+                            { usernameValido(username) ? username : ""}
 
                         </Text>
                         <Text
@@ -160,7 +169,7 @@ export default function PaginaInicial() {
                                 borderRadius: '1000px'
                             }}
                         >
-                            {local}
+                            {usernameValido(username) ? local : ""}
 
                         </Text>
                     </Box>
