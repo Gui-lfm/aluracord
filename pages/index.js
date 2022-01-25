@@ -92,7 +92,7 @@ export default function PaginaInicial() {
                             }}
                         />
                         {username.length <= 1
-                            ? <span>'Preencha o campo com um usuário válido'</span>
+                            ? <span>Preencha o campo com um usuário válido</span>
                             : ''}
                         <Button
                             placeholder="olá"
