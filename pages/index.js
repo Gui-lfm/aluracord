@@ -1,34 +1,7 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import appConfig from "../config.json"
-
-function GlobalStyle() {
-    return (
-        <style global jsx>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          list-style: none;
-        }
-        body {
-          font-family: 'Open Sans', sans-serif;
-        }
-        /* App fit Height */ 
-        html, body, #__next {
-          min-height: 100vh;
-          display: flex;
-          flex: 1;
-        }
-        #__next {
-          flex: 1;
-        }
-        #__next > * {
-          flex: 1;
-        }
-        /* ./App fit Height */ 
-      `}</style>
-    );
-}
+import { useState, useEffect } from 'react';
+import { useRouter } from "next/router"
 
 function Titulo(props) {
     const Tag = props.tag || 'h1';
@@ -46,11 +19,22 @@ function Titulo(props) {
     );
 }
 export default function PaginaInicial() {
-    const username = 'gui-lfm';
+
+    const [username, setUsername] = useState("gui-lfm")
+    const [local, setLocal] = useState()
+    const rota = useRouter();
+    useEffect(() => {
+
+        fetch(`https://api.github.com/users/${username}`)
+            .then((resposta) => resposta.json())
+            .then(function (respostaCompleta) {
+                const local = respostaCompleta.location
+                setLocal(local)
+            })
+    })
 
     return (
         <>
-            <GlobalStyle />
             <Box
                 styleSheet={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -77,17 +61,26 @@ export default function PaginaInicial() {
                     {/* Formulário */}
                     <Box
                         as="form"
+                        onSubmit={(event) => {
+                            event.preventDefault()
+                            if(username.length > 1)rota.push('/chat')
+                        }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
-                        <Titulo tag="h2">Bem vindo, {username}</Titulo>
+                        <Titulo tag="h2">{username.length <= 1 ? `bem vindo ao Aluracord!` : `Bem vindo, ${username} !`}</Titulo>
                         <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
                             {appConfig.name}
                         </Text>
 
                         <TextField
+                            placeholder='digite o seu usuário'
+                            value={username}
+                            onChange={(event) => {
+                                setUsername(event.target.value)
+                            }}
                             fullWidth
                             textFieldColors={{
                                 neutral: {
@@ -98,7 +91,11 @@ export default function PaginaInicial() {
                                 },
                             }}
                         />
+                        {username.length <= 1
+                            ? <span>'Preencha o campo com um usuário válido'</span>
+                            : ''}
                         <Button
+                            placeholder="olá"
                             type='submit'
                             label='Entrar'
                             fullWidth
@@ -134,9 +131,14 @@ export default function PaginaInicial() {
                                 borderRadius: '50%',
                                 marginBottom: '16px',
                             }}
-                            src={`https://github.com/${username}.png`}
+                            src={username.length <= 1 || !`https://github.com/${username}.png` ?
+                                "https://st3.depositphotos.com/4111759/13425/v/600/depositphotos_134255634-stock-illustration-avatar-icon-male-profile-gray.jpg" :
+                                `https://github.com/${username}.png`
+
+                            }
                         />
                         <Text
+
                             variant="body4"
                             styleSheet={{
                                 color: appConfig.theme.colors.neutrals[200],
@@ -146,6 +148,20 @@ export default function PaginaInicial() {
                             }}
                         >
                             {username}
+
+                        </Text>
+                        <Text
+
+                            variant="body4"
+                            styleSheet={{
+                                color: appConfig.theme.colors.neutrals[200],
+                                backgroundColor: appConfig.theme.colors.neutrals[900],
+                                padding: '3px 10px',
+                                borderRadius: '1000px'
+                            }}
+                        >
+                            {local}
+
                         </Text>
                     </Box>
                     {/* Photo Area */}
