@@ -11,7 +11,7 @@ function GlobalStyle() { //min-height: 100vh arruma a altura da aplicação
           font-family: 'Open Sans', sans-serif;
         }
         span {
-          color: red
+          color: coral
         }
         /* App fit Height */ 
         html, body, #__next {
