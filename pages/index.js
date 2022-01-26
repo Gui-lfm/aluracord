@@ -104,7 +104,6 @@ export default function PaginaInicial() {
                             : ''}
                         <Button
                             disabled={!usernameValido(username)}
-                            placeholder="olá"
                             type='submit'
                             label='Entrar'
                             fullWidth
