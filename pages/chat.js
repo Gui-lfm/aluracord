@@ -3,7 +3,7 @@ import { useState } from 'react';
 import appConfig from '../config.json';
 import { format } from 'date-fns'
 import { FaTrashAlt } from "react-icons/fa";
-
+import BotoesReacao from '../components/emoji';
 
 export default function ChatPage() {
     const [mensagem, setMensagem] = useState("");
@@ -50,6 +50,7 @@ export default function ChatPage() {
                     maxWidth: '95%',
                     maxHeight: '95vh',
                     padding: '32px',
+                    opacity: '0.9'
                 }}
             >
                 <Header />
@@ -89,7 +90,11 @@ export default function ChatPage() {
                                 if (evento.key === 'Enter') {
 
                                     evento.preventDefault();
-                                    HandleNovaMensagem(mensagem)
+                                    if (mensagem !== '') {
+
+                                        HandleNovaMensagem(mensagem)
+                                    }
+
                                 }
                             }}
                             styleSheet={{
@@ -105,6 +110,7 @@ export default function ChatPage() {
                         />
                         <Button
                             label='Enviar'
+                            disabled={mensagem === ''}
                             type='submit'
                             colorVariant='neutral'
                             onClick={(evento) => {
@@ -170,6 +176,7 @@ function MessageList(props) {
                         key={mensagem.id}
                         tag="li"
                         styleSheet={{
+
                             borderRadius: '5px',
                             padding: '6px',
                             marginBottom: '12px',
@@ -225,45 +232,6 @@ function MessageList(props) {
 
                 )
             })}
-            <div>{ }</div>
         </Box>
     )
-}
-
-function BotoesReacao() {
-
-    const [contador, setContador] = useState({ curti: 0, amei: 0, haha: 0, uau: 0, triste: 0, grr: 0, olha: 0 })
-
-    const emojis = {
-
-        curti: '👍',
-        amei: '❤️',
-        haha: '😄',
-        uau: '😮',
-        triste: '😢',
-        grr: '😡',
-        olha: '👀',
-    }
-
-    const botesEmoji = Object.entries(emojis).map(([nome, emoji]) => {
-
-        return (
-
-            <Button key={nome}
-                type='button'
-                variant='secondary'
-                colorVariant='light'
-                rounded='md'
-                styleSheet={{ margin: '5px' }}
-                label={`${emoji} : ${contador[nome]}`}
-                onClick={(evento) => {
-                    evento.preventDefault()
-                    contador[nome] += 1
-                    setContador({ ...contador })
-                }}
-            />
-        )
-    })
-
-    return <div>{botesEmoji}</div>
 }
