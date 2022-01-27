@@ -71,7 +71,12 @@ export default function PaginaInicial() {
                         as="form"
                         onSubmit={(event) => {
                             event.preventDefault()
-                            if (usernameValido(username)) rota.push('/chat')
+                            if (usernameValido(username)) {
+                                rota.push({
+                                    pathname: '/chat',
+                                    query: {username: username}
+                                })
+                            }
                         }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -155,7 +160,7 @@ export default function PaginaInicial() {
                                 borderRadius: '1000px'
                             }}
                         >
-                            { usernameValido(username) ? username : ""}
+                            {usernameValido(username) ? username : ""}
 
                         </Text>
                         <Text

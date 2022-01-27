@@ -1,29 +1,59 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import appConfig from '../config.json';
 import { format } from 'date-fns'
-import { FaTrashAlt } from "react-icons/fa";
+import { MdSend, MdDelete } from "react-icons/md";
 import BotoesReacao from '../components/emoji';
+import { createClient } from '@supabase/supabase-js'
+import { useRouter } from 'next/router';
+import SkeletonComponent from '../components/SkeletonComponent';
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzI4ODk2OSwiZXhwIjoxOTU4ODY0OTY5fQ.tHwLIejfAWQf6B0UW6--TtkOjmo7iW17BRtaRlYZSs8'
+const SUPABASE_URL = 'https://mnqcvjdwsjcwxpxtstvo.supabase.co'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 export default function ChatPage() {
+    const rota = useRouter();
     const [mensagem, setMensagem] = useState("");
     const [listaMensagens, setListaMensagens] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', { ascending: false })
+            .then(({ data }) => {
+                setListaMensagens(data)
+                setLoading(false)
+            })
+    }, []);
 
     function HandleNovaMensagem(novaMensagem) {
 
         const mensagem = {
 
-            id: listaMensagens.length + 1,
-            author: "Guilherme Lucena",
-            text: novaMensagem,
-            time: format(new Date(), 'dd/MM/yyyy - HH:mm'),
+            // id: listaMensagens.length + 1,
+            created_at: format(new Date(), 'dd/MM/yyyy - HH:mm'),
+            de: rota.query.username,
+            texto: novaMensagem,
         }
 
-        setListaMensagens([
+        supabaseClient
+            .from('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then(({ data }) => {
+                console.log(data)
+                setListaMensagens([
 
-            mensagem,
-            ...listaMensagens,
-        ])
+                    data[0],
+                    ...listaMensagens,
+                ])
+
+            })
 
         setMensagem('')
     }
@@ -32,7 +62,7 @@ export default function ChatPage() {
         <Box
             styleSheet={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: appConfig.theme.colors.primary[500],
+                backgroundColor: appConfig.theme.colors.primary[200],
                 backgroundImage: `url(https://image.api.playstation.com/vulcan/ap/rnd/202006/1013/Tu50Ln3ufMplxrBg01SQxtpx.png)`,
                 backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 color: appConfig.theme.colors.neutrals['000']
@@ -47,7 +77,7 @@ export default function ChatPage() {
                     borderRadius: '5px',
                     backgroundColor: appConfig.theme.colors.neutrals[700],
                     height: '100%',
-                    maxWidth: '95%',
+                    maxWidth: '60%',
                     maxHeight: '95vh',
                     padding: '32px',
                     opacity: '0.9'
@@ -67,7 +97,7 @@ export default function ChatPage() {
                     }}
                 >
 
-                    <MessageList mensagens={listaMensagens} setListaMensagens={setListaMensagens} />
+                    <MessageList mensagens={listaMensagens} setListaMensagens={setListaMensagens} loading={loading} />
 
                     <Box
                         as="form"
@@ -109,7 +139,7 @@ export default function ChatPage() {
                             }}
                         />
                         <Button
-                            label='Enviar'
+                            label={<MdSend />}
                             disabled={mensagem === ''}
                             type='submit'
                             colorVariant='neutral'
@@ -147,14 +177,24 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log('MessageList', props);
+    const [mouseOver, setMouseEmCima] = useState(false);
+
+    function handleMouseOver() {
+
+        setMouseEmCima(true)
+        console.log(mouseOver)
+    }
+
+    function handleMouseOut() {
+
+        setMouseEmCima(false)
+        console.log(mouseOver)
+    }
 
     function removeMensagem(id) {
-        console.log('fução foi chamada')
         const novaLista = props.mensagens.filter(mensagem => mensagem.id !== id) //cria uma nova lista somente com os elementos que não correspondem ao filtro
         props.setListaMensagens([...novaLista])
     }
-
 
     return (
         <Box
@@ -168,8 +208,8 @@ function MessageList(props) {
                 marginBottom: '16px',
             }}
         >
-
-            {props.mensagens.map((mensagem) => {
+            {props.loading && <SkeletonComponent />}
+            {!props.loading && props.mensagens.map((mensagem) => {
 
                 return (
                     <Text
@@ -191,6 +231,8 @@ function MessageList(props) {
                             }}
                         >
                             <Image
+                                onMouseOver={handleMouseOver}
+                                onMouseOut={handleMouseOut}
                                 styleSheet={{
                                     width: '20px',
                                     height: '20px',
@@ -198,10 +240,12 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/gui-lfm.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
+
+
                             />
                             <Text tag="strong">
-                                {mensagem.author}
+                                {mensagem.de}
                             </Text>
                             <Text
                                 styleSheet={{
@@ -212,10 +256,10 @@ function MessageList(props) {
                                 }}
                                 tag="span"
                             >
-                                {mensagem.time}
+                                {mensagem.created_at}
                             </Text>
 
-                            <FaTrashAlt
+                            <MdDelete
                                 cursor='pointer'
                                 color='coral'
                                 onClick={(evento) => {
@@ -226,10 +270,9 @@ function MessageList(props) {
                             />
 
                         </Box>
-                        {mensagem.text}
+                        {mensagem.texto}
                         <BotoesReacao />
                     </Text>
-
                 )
             })}
         </Box>
