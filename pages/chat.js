@@ -1,17 +1,39 @@
-import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import { useState, useEffect } from 'react';
+import { Box, TextField, Button } from '@skynexui/components';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { format } from 'date-fns'
-import { MdSend, MdDelete } from "react-icons/md";
-import BotoesReacao from '../components/emoji';
+import { MdSend } from "react-icons/md";
 import { createClient } from '@supabase/supabase-js'
-import { useRouter } from 'next/router';
-import SkeletonComponent from '../components/SkeletonComponent';
+import { ButtonSendSticker } from '../src/components/ButtonSendStickers';
+import Header from '../src/components/Header';
+import MessageList from '../src/components/MessageList';
 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzI4ODk2OSwiZXhwIjoxOTU4ODY0OTY5fQ.tHwLIejfAWQf6B0UW6--TtkOjmo7iW17BRtaRlYZSs8'
-const SUPABASE_URL = 'https://mnqcvjdwsjcwxpxtstvo.supabase.co'
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+/*
+// To Do:
+// [x] implementar popout ao passar o mouse em cima da foto;
+// [x] implementar link que redireciona ao perfil do usuario do github ao clicar no seu nome no chat;
+// [x] colocar as chaves do supabase em local seguro;
+// [] implementar modo noturno (no caso diurno);
+// [] deletar msg deve deletar do  banco de dados do supabase tb && usuario só pode deletar as próprias msgs
+// [] botoes de reação devem ser implementados no banco de dados;
+// [x] corrigir código do skeleton component;
+ */
+
+function EscutaEmTempoReal(adicionaMensagem) {
+
+    return supabaseClient
+        .from('mensagens')
+        .on('INSERT', (mudancaLive) => {
+            adicionaMensagem(mudancaLive.new)
+        })
+        .subscribe();
+}
+
 
 export default function ChatPage() {
     const rota = useRouter();
@@ -30,11 +52,27 @@ export default function ChatPage() {
             })
     }, []);
 
+    EscutaEmTempoReal((novaMensagem) => {
+
+        console.log('Nova mensagem:', novaMensagem);
+        console.log('listaDeMensagens:', listaMensagens);
+
+        setListaMensagens((valorAtual) => {
+
+            return [
+
+                novaMensagem,
+                ...valorAtual,
+            ]
+        })
+    })
+
+
+
     function HandleNovaMensagem(novaMensagem) {
 
         const mensagem = {
 
-            // id: listaMensagens.length + 1,
             created_at: format(new Date(), 'dd/MM/yyyy - HH:mm'),
             de: rota.query.username,
             texto: novaMensagem,
@@ -46,13 +84,7 @@ export default function ChatPage() {
                 mensagem
             ])
             .then(({ data }) => {
-                console.log(data)
-                setListaMensagens([
-
-                    data[0],
-                    ...listaMensagens,
-                ])
-
+                console.log(`msg criada ${data}`)
             })
 
         setMensagem('')
@@ -96,7 +128,6 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-
                     <MessageList mensagens={listaMensagens} setListaMensagens={setListaMensagens} loading={loading} />
 
                     <Box
@@ -138,7 +169,21 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
+                        <ButtonSendSticker onStickerClick={
+                            (sticker) => {
+                                HandleNovaMensagem(`:sticker: ${sticker}`)
+                            }} />
                         <Button
+                            styleSheet={{
+                                padding: '0 3px 0 0',
+                                margin: '0 0 8px 8px',
+                                minWidth: '50px',
+                                minHeight: '50px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: appConfig.theme.colors.neutrals[300],
+                            }}
                             label={<MdSend />}
                             disabled={mensagem === ''}
                             type='submit'
@@ -149,132 +194,9 @@ export default function ChatPage() {
                                 HandleNovaMensagem(mensagem)
                             }}
                         />
-
-
                     </Box>
                 </Box>
             </Box>
-        </Box>
-    )
-}
-
-function Header() {
-    return (
-        <>
-            <Box styleSheet={{ width: '100%', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                <Text variant='heading5' tag='h2'>
-                    Chat
-                </Text>
-                <Button
-                    variant='tertiary'
-                    colorVariant='neutral'
-                    label='Logout'
-                    href="/"
-                />
-            </Box>
-        </>
-    )
-}
-
-function MessageList(props) {
-    const [mouseOver, setMouseEmCima] = useState(false);
-
-    function handleMouseOver() {
-
-        setMouseEmCima(true)
-        console.log(mouseOver)
-    }
-
-    function handleMouseOut() {
-
-        setMouseEmCima(false)
-        console.log(mouseOver)
-    }
-
-    function removeMensagem(id) {
-        const novaLista = props.mensagens.filter(mensagem => mensagem.id !== id) //cria uma nova lista somente com os elementos que não correspondem ao filtro
-        props.setListaMensagens([...novaLista])
-    }
-
-    return (
-        <Box
-            tag="ul"
-            styleSheet={{
-                overflow: 'auto',
-                display: 'flex',
-                flexDirection: 'column-reverse',
-                flex: 1,
-                color: appConfig.theme.colors.neutrals["000"],
-                marginBottom: '16px',
-            }}
-        >
-            {props.loading && <SkeletonComponent />}
-            {!props.loading && props.mensagens.map((mensagem) => {
-
-                return (
-                    <Text
-                        key={mensagem.id}
-                        tag="li"
-                        styleSheet={{
-
-                            borderRadius: '5px',
-                            padding: '6px',
-                            marginBottom: '12px',
-                            hover: {
-                                backgroundColor: appConfig.theme.colors.neutrals[700],
-                            }
-                        }}
-                    >
-                        <Box
-                            styleSheet={{
-                                marginBottom: '8px',
-                            }}
-                        >
-                            <Image
-                                onMouseOver={handleMouseOver}
-                                onMouseOut={handleMouseOut}
-                                styleSheet={{
-                                    width: '20px',
-                                    height: '20px',
-                                    borderRadius: '50%',
-                                    display: 'inline-block',
-                                    marginRight: '8px',
-                                }}
-                                src={`https://github.com/${mensagem.de}.png`}
-
-
-                            />
-                            <Text tag="strong">
-                                {mensagem.de}
-                            </Text>
-                            <Text
-                                styleSheet={{
-                                    fontSize: '10px',
-                                    marginLeft: '8px',
-                                    marginRight: '8px',
-                                    color: appConfig.theme.colors.neutrals[300],
-                                }}
-                                tag="span"
-                            >
-                                {mensagem.created_at}
-                            </Text>
-
-                            <MdDelete
-                                cursor='pointer'
-                                color='coral'
-                                onClick={(evento) => {
-
-                                    evento.preventDefault();
-                                    removeMensagem(mensagem.id)
-                                }}
-                            />
-
-                        </Box>
-                        {mensagem.texto}
-                        <BotoesReacao />
-                    </Text>
-                )
-            })}
         </Box>
     )
 }

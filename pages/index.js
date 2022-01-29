@@ -72,10 +72,7 @@ export default function PaginaInicial() {
                         onSubmit={(event) => {
                             event.preventDefault()
                             if (usernameValido(username)) {
-                                rota.push({
-                                    pathname: '/chat',
-                                    query: {username: username}
-                                })
+                                rota.push(`/chat?username=${username}`)
                             }
                         }}
                         styleSheet={{
@@ -104,7 +101,7 @@ export default function PaginaInicial() {
                                 },
                             }}
                         />
-                        {!usernameValido(username)
+                        {!usernameValido(username) && username.length !== 0
                             ? <span>Preencha o campo com um usuário válido</span>
                             : ''}
                         <Button
