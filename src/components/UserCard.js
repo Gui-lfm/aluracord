@@ -11,7 +11,7 @@ export default function UserCard(props) {
         fetch(`https://api.github.com/users/${props.autor}`)
             .then(async (resposta) => {
                 let dados = await resposta.json()
-                let seguidores = dados.following
+                let seguidores = dados.followers
                 setSeguidores(seguidores)
                 let repositorios = dados.public_repos
                 setRepositorios(repositorios)
