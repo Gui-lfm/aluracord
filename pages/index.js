@@ -20,7 +20,7 @@ function Titulo(props) {
 }
 export default function PaginaInicial() {
 
-    const [username, setUsername] = useState("gui-lfm")
+    const [username, setUsername] = useState('')
     const [local, setLocal] = useState()
     const rota = useRouter();
     useEffect(() => {
