@@ -1,3 +1,6 @@
+import React from 'react';
+import {AppWrapper} from '../src/context/themes'
+
 function GlobalStyle() { //min-height: 100vh arruma a altura da aplicação
   return (
     <style global jsx>{`
@@ -26,10 +29,8 @@ function GlobalStyle() { //min-height: 100vh arruma a altura da aplicação
           color: white
         }
         span {
-          color: coral;
           line-height: 2;
-        }
-        
+        }       
         /* App fit Height */ 
         html, body, #__next {
           min-height: 100vh; 
@@ -48,10 +49,13 @@ function GlobalStyle() { //min-height: 100vh arruma a altura da aplicação
 }
 
 export default function MyApp({ Component, pageProps }) {
+
   return (
     <>
-      <GlobalStyle />
-      <Component {...pageProps} />
+      <AppWrapper>
+        <GlobalStyle />
+        <Component {...pageProps} />
+      </AppWrapper>
     </>
   )
 }

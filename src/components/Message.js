@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Box, Text, Image } from '@skynexui/components'
 import appConfig from '../../config.json'
 
+
 export default function Message(props) {
     const [anchorEl, setAnchorEl] = useState(null);
 
@@ -19,6 +20,8 @@ export default function Message(props) {
 
     const open = Boolean(anchorEl);
 
+    const tema = props.tema
+
     return (
         <>
             <Text
@@ -30,7 +33,7 @@ export default function Message(props) {
                     padding: '6px',
                     marginBottom: '12px',
                     hover: {
-                        backgroundColor: appConfig.theme.colors.neutrals[700],
+                        backgroundColor:tema.menuP,
                     }
                 }}
             >
@@ -69,18 +72,24 @@ export default function Message(props) {
                         onClose={handlePopoverClose}
                         disableRestoreFocus
                     >
-                        <UserCard autor={props.autor}/>
+                        <UserCard tema={tema} autor={props.autor}/>
                     </Popover>
 
                     <Text tag="strong">
-                        <a href={`https://github.com/${props.autor}`}>{props.autor}</a>
+                        <Text 
+                        tag='a' 
+                        href={`https://github.com/${props.autor}`}
+                        styleSheet={{
+                            color: tema.text
+                        }}
+                        >{props.autor}</Text>
                     </Text>
                     <Text
                         styleSheet={{
                             fontSize: '10px',
                             marginLeft: '8px',
                             marginRight: '8px',
-                            color: appConfig.theme.colors.neutrals[300],
+                            color: tema.textInfos,
                         }}
                         tag="span"
                     >
@@ -89,7 +98,7 @@ export default function Message(props) {
 
                     <MdDelete
                         cursor='pointer'
-                        color='coral'
+                        color= {tema.span}
                         onClick={(evento) => {
 
                             evento.preventDefault();
@@ -108,7 +117,7 @@ export default function Message(props) {
                     : (
                         props.texto
                     )}
-                <BotoesReacao />
+                <BotoesReacao tema={tema}/>
             </Text>
         </>
     )

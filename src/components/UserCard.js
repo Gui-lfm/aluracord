@@ -18,10 +18,12 @@ export default function UserCard(props) {
             })
     }, [])
 
+    const tema = props.tema
+
     return (
         <>
             <Box styleSheet={{
-                backgroundColor: appConfig.theme.colors.neutrals[700],
+                backgroundColor: tema.menuP,
                 height: '190px',
                 bottom: '30px',
                 width: {
@@ -41,8 +43,8 @@ export default function UserCard(props) {
                     <Image
                         src={`https://github.com/${props.autor}.png`}
                         styleSheet={{
-                            width: '80px',
-                            height: '80px',
+                            width: '30%',
+                            height: '30%',
                             borderRadius: '50%',
                             padding: '8px',
                         }}
@@ -50,7 +52,7 @@ export default function UserCard(props) {
                     <Text
                         tag='h3'
                         styleSheet={{
-                            color: 'white',
+                            color: tema.text,
                             fontSize: '2em'
                         }}>
                         {props.autor}
@@ -64,17 +66,18 @@ export default function UserCard(props) {
                         padding: '12px',
                         borderRadius: '5px',
 
-                        backgroundColor: appConfig.theme.colors.neutrals[600],
+                        backgroundColor: tema.menuS,
                         boxShadow: 'rgba(4, 4, 5, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.24) 0px 8px 16px 0px'
                     }}
                     tag='ul'
                 >
                     <Text
                         styleSheet={{
-                            backgroundColor: 'white',
+                            backgroundColor: tema.text,
                             borderRadius: '5px',
                             marginRight: '50px',
                             padding: '3px',
+                            color: tema.chat
                         }}
                         tag='li'
                     >
@@ -83,10 +86,11 @@ export default function UserCard(props) {
 
                     <Text
                         styleSheet={{
-                            backgroundColor: 'white',
+                            backgroundColor: tema.text,
                             borderRadius: '5px',
                             marginRight: '50px',
                             padding: '3px',
+                            color: tema.chat
                         }}
                         tag='li'
                     >

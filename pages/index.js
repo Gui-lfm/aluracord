@@ -2,15 +2,18 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import appConfig from "../config.json"
 import { useState, useEffect } from 'react';
 import { useRouter } from "next/router"
+import { useAppContext } from '../src/context/themes';
+import { Switch } from '@mui/material';
 
 function Titulo(props) {
     const Tag = props.tag || 'h1';
+    const tema = props.tema
     return (
         <>
             <Tag>{props.children}</Tag>
             <style jsx>{`
               ${Tag} {
-                  color: ${appConfig.theme.colors.neutrals['000']};
+                  color: ${tema.text};
                   font-size: 24px;
                   font-weight: 600;
               }
@@ -23,6 +26,10 @@ export default function PaginaInicial() {
     const [username, setUsername] = useState('')
     const [local, setLocal] = useState()
     const rota = useRouter();
+    const estilo = useAppContext()
+    const [tema, setTema] = useState(estilo.dark)
+
+
     useEffect(() => {
 
         fetch(`https://api.github.com/users/${username}`)
@@ -33,6 +40,8 @@ export default function PaginaInicial() {
             })
     })
 
+    
+
     function usernameValido(usuario) {
 
         if (usuario.length > 2) {
@@ -40,13 +49,12 @@ export default function PaginaInicial() {
             return usuario
         }
     }
-
     return (
         <>
             <Box
                 styleSheet={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: appConfig.theme.colors.primary[200],
+                    backgroundColor: '#99FDFF',
                     backgroundImage: 'url(https://cdn2.unrealengine.com/egs-whiletruelearn-ludenio-g1c-00-1920x1080-5b8971ca03fe.jpg)',
                     backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 }}
@@ -63,10 +71,11 @@ export default function PaginaInicial() {
                         width: '100%', maxWidth: '700px',
                         borderRadius: '5px', padding: '32px', margin: '16px',
                         boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-                        backgroundColor: appConfig.theme.colors.neutrals[700],
+                        backgroundColor: tema.menuP,
                     }}
                 >
                     {/* Formulário */}
+                    
                     <Box
                         as="form"
                         onSubmit={(event) => {
@@ -80,8 +89,9 @@ export default function PaginaInicial() {
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
                         }}
                     >
-                        <Titulo tag="h2">{!usernameValido(username) ? `bem vindo ao Aluracord!` : `Bem vindo, ${username} !`}</Titulo>
-                        <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
+                       
+                        <Titulo tag="h2" tema={tema}>{!usernameValido(username) ? `bem vindo ao Aluracord!` : `Bem vindo, ${username} !`}</Titulo>
+                        <Text variant="body3" styleSheet={{ marginBottom: '32px', color: tema.textInfos }}>
                             {appConfig.name}
                         </Text>
 
@@ -94,15 +104,15 @@ export default function PaginaInicial() {
                             fullWidth
                             textFieldColors={{
                                 neutral: {
-                                    textColor: appConfig.theme.colors.neutrals[200],
-                                    mainColor: appConfig.theme.colors.neutrals[900],
-                                    mainColorHighlight: appConfig.theme.colors.primary[500],
-                                    backgroundColor: appConfig.theme.colors.neutrals[800],
+                                    textColor: tema.textInfos,
+                                    mainColor: tema.btnHover,
+                                    mainColorHighlight: tema.btn,
+                                    backgroundColor: tema.chat,
                                 },
                             }}
                         />
                         {!usernameValido(username) && username.length !== 0
-                            ? <span>Preencha o campo com um usuário válido</span>
+                            ? <Text styleSheet={{ color: tema.span }}>Digite um usuário github válido</Text >
                             : ''}
                         <Button
                             disabled={!usernameValido(username)}
@@ -110,12 +120,12 @@ export default function PaginaInicial() {
                             label='Entrar'
                             fullWidth
                             buttonColors={{
-                                contrastColor: appConfig.theme.colors.neutrals["000"],
-                                mainColor: appConfig.theme.colors.primary[500],
-                                mainColorLight: appConfig.theme.colors.primary[400],
-                                mainColorStrong: appConfig.theme.colors.primary[600],
+                                contrastColor: tema.text,
+                                mainColor: tema.btn,
+                                mainColorStrong: tema.btnHover,
                             }}
                         />
+                        
                     </Box>
                     {/* Formulário */}
 
@@ -128,9 +138,9 @@ export default function PaginaInicial() {
                             alignItems: 'center',
                             maxWidth: '200px',
                             padding: '16px',
-                            backgroundColor: appConfig.theme.colors.neutrals[800],
+                            backgroundColor: tema.chat,
                             border: '1px solid',
-                            borderColor: appConfig.theme.colors.neutrals[999],
+                            borderColor: '#080A0C',
                             borderRadius: '10px',
                             flex: 1,
                             minHeight: '240px',
@@ -151,8 +161,8 @@ export default function PaginaInicial() {
 
                             variant="body4"
                             styleSheet={{
-                                color: appConfig.theme.colors.neutrals[200],
-                                backgroundColor: appConfig.theme.colors.neutrals[900],
+                                color: tema.textInfos,
+                                backgroundColor: tema.menuS,
                                 padding: '3px 10px',
                                 borderRadius: '1000px'
                             }}
@@ -164,8 +174,8 @@ export default function PaginaInicial() {
 
                             variant="body4"
                             styleSheet={{
-                                color: appConfig.theme.colors.neutrals[200],
-                                backgroundColor: appConfig.theme.colors.neutrals[900],
+                                color: tema.textInfos,
+                                backgroundColor: tema.menuS,
                                 padding: '3px 10px',
                                 borderRadius: '1000px'
                             }}
@@ -173,7 +183,9 @@ export default function PaginaInicial() {
                             {usernameValido(username) ? local : ""}
 
                         </Text>
+                        
                     </Box>
+                    
                     {/* Photo Area */}
                 </Box>
             </Box>

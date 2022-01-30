@@ -1,4 +1,4 @@
-import {Box, Text, Button} from '@skynexui/components'
+import { Box, Text, Button } from '@skynexui/components'
 
 export default function Header() {
     return (
@@ -7,6 +7,7 @@ export default function Header() {
                 <Text variant='heading5' tag='h2'>
                     Chat
                 </Text>
+
                 <Button
                     variant='tertiary'
                     colorVariant='neutral'
@@ -14,6 +15,16 @@ export default function Header() {
                     href="/"
                 />
             </Box>
+            <Box
+                tag='div'
+                styleSheet={{
+
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end'
+                }}>
+            </Box>
+
         </>
     )
 }

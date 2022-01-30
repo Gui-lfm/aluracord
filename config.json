@@ -1,35 +1,5 @@
 {
     "name": "Aluracord",
-    "theme": {
-      "colors": {
-        "primary": {
-          "050": "#E3F9E5",
-          "100": "#C1EAC5",
-          "200": "#99FDFF",
-          "300": "#7BC47F",
-          "400": "#57AE5B",
-          "500": "#006668",
-          "600": "#003C3D",
-          "700": "#207227",
-          "800": "#0E5814",
-          "900": "#05400A"
-        },
-        "neutrals": {
-          "000": "#FFFFFF",
-          "050": "#F5F7FA",
-          "100": "#E4E7EB",
-          "200": "#CBD2D9",
-          "300": "#A6CFD5",
-          "400": "#52667A",
-          "500": "#313D49",
-          "600": "#29333D",
-          "700": "#2A2A3C",
-          "800": "#191923",
-          "900": "#101418",
-          "999": "#080A0C"
-        }
-      }
-    },
     "stickers": [
       "https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_1.png",
       "https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_2.png",

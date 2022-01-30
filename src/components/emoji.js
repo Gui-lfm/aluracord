@@ -2,7 +2,7 @@ import { Button, Box } from '@skynexui/components'
 import { useState } from 'react'
 
 
-export default function BotoesReacao() {
+export default function BotoesReacao(props) {
 
     const [contador, setContador] = useState({ curti: 0, amei: 0, haha: 0, uau: 0, triste: 0, grr: 0, olha: 0 })
 
@@ -17,6 +17,8 @@ export default function BotoesReacao() {
         olha: '👀',
     }
 
+    const tema= props.tema
+
     const botesEmoji = Object.entries(emojis).map(([nome, emoji]) => {
 
         return (
@@ -24,9 +26,12 @@ export default function BotoesReacao() {
             <Button key={nome}
                 type='button'
                 variant='secondary'
-                colorVariant='light'
                 rounded='md'
-                styleSheet={{ margin: '5px' }}
+                styleSheet={{ 
+                    margin: '5px',
+                    color: tema.text,
+                    borderColor: tema.text
+                }}
                 label={`${emoji} : ${contador[nome]}`}
                 onClick={(evento) => {
                     evento.preventDefault()
