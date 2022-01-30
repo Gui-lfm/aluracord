@@ -1,5 +1,5 @@
 import React from 'react';
-import {AppWrapper} from '../src/context/themes'
+import { AppWrapper } from '../src/context/themes'
 
 function GlobalStyle() { //min-height: 100vh arruma a altura da aplicação
   return (

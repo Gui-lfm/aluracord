@@ -4,8 +4,6 @@ import { Popover } from '@mui/material';
 import BotoesReacao from './emoji';
 import { useState } from 'react';
 import { Box, Text, Image } from '@skynexui/components'
-import appConfig from '../../config.json'
-
 
 export default function Message(props) {
     const [anchorEl, setAnchorEl] = useState(null);
@@ -33,7 +31,7 @@ export default function Message(props) {
                     padding: '6px',
                     marginBottom: '12px',
                     hover: {
-                        backgroundColor:tema.menuP,
+                        backgroundColor: tema.menuP,
                     }
                 }}
             >
@@ -72,16 +70,16 @@ export default function Message(props) {
                         onClose={handlePopoverClose}
                         disableRestoreFocus
                     >
-                        <UserCard tema={tema} autor={props.autor}/>
+                        <UserCard tema={tema} autor={props.autor} />
                     </Popover>
 
                     <Text tag="strong">
-                        <Text 
-                        tag='a' 
-                        href={`https://github.com/${props.autor}`}
-                        styleSheet={{
-                            color: tema.text
-                        }}
+                        <Text
+                            tag='a'
+                            href={`https://github.com/${props.autor}`}
+                            styleSheet={{
+                                color: tema.text
+                            }}
                         >{props.autor}</Text>
                     </Text>
                     <Text
@@ -95,16 +93,15 @@ export default function Message(props) {
                     >
                         {props.data}
                     </Text>
-
-                    <MdDelete
+                    {props.usuarioLogado === props.autor && <MdDelete
                         cursor='pointer'
-                        color= {tema.span}
+                        color={tema.span}
                         onClick={(evento) => {
 
                             evento.preventDefault();
-                            props.removeMensagem(props.id)
+                            props.ApagaMensagem(props.id)
                         }}
-                    />
+                    />}
 
                 </Box>
                 {props.texto.startsWith(':sticker:')
@@ -117,7 +114,7 @@ export default function Message(props) {
                     : (
                         props.texto
                     )}
-                <BotoesReacao tema={tema}/>
+                <BotoesReacao tema={tema} />
             </Text>
         </>
     )

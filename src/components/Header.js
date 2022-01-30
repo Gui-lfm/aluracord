@@ -15,15 +15,6 @@ export default function Header() {
                     href="/"
                 />
             </Box>
-            <Box
-                tag='div'
-                styleSheet={{
-
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end'
-                }}>
-            </Box>
 
         </>
     )

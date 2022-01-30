@@ -26,6 +26,7 @@ export default function BotoesReacao(props) {
             <Button key={nome}
                 type='button'
                 variant='secondary'
+                colorVariant='light'
                 rounded='md'
                 styleSheet={{ 
                     margin: '5px',

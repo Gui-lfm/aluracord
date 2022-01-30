@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, TextField, Button } from '@skynexui/components';
 import { useRouter } from 'next/router';
 import { format } from 'date-fns'
@@ -21,18 +21,17 @@ const supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
 // [x] implementar link que redireciona ao perfil do usuario do github ao clicar no seu nome no chat;
 // [x] colocar as chaves do supabase em local seguro;
 // [x] corrigir código do skeleton component;
+// [x] implementar alternacia de tema na chatpage
+// [x] msgs devem ser deletadas direto na database e o usuário só pode deletar as próprias msgs
+// [] botoes de reacao devem ser colocados no supabase 
  */
 
-function EscutaEmTempoReal(adicionaMensagem) {
-
-    return supabaseClient
-        .from('mensagens')
-        .on('INSERT', (mudancaLive) => {
-            adicionaMensagem(mudancaLive.new)
-        })
-        .subscribe();
+function EscutaEmTempoReal(AtualizaListaMsgs) {
+    supabaseClient
+        .from("mensagens")
+        .on('*', AtualizaListaMsgs) //atualiza a lista caso ocorra um insert, update e delete
+        .subscribe()
 }
-
 
 export default function ChatPage() {
     const rota = useRouter();
@@ -49,7 +48,7 @@ export default function ChatPage() {
             : setTema(estilo.dark)
     }
 
-    useEffect(() => {
+    function AtualizaListaMsgs() {
         supabaseClient
             .from('mensagens')
             .select('*')
@@ -58,28 +57,30 @@ export default function ChatPage() {
                 setListaMensagens(data)
                 setLoading(false)
             })
+
+    }
+
+    useEffect(() => {
+        AtualizaListaMsgs()
+        EscutaEmTempoReal(AtualizaListaMsgs)
     }, []);
 
-    EscutaEmTempoReal((novaMensagem) => {
+    function ApagaMensagem(id) {
+        supabaseClient
+            .from("mensagens")
+            .delete(false)
+            .match({ "id": id })
+            .then(() => AtualizaListaMsgs())
+    }
 
-        setListaMensagens((valorAtual) => {
-
-            return [
-
-                novaMensagem,
-                ...valorAtual,
-            ]
-        })
-    })
-
-
+    const usuarioLogado = rota.query.username
 
     function HandleNovaMensagem(novaMensagem) {
 
         const mensagem = {
 
             created_at: format(new Date(), 'dd/MM/yyyy - HH:mm'),
-            de: rota.query.username,
+            de: usuarioLogado,
             texto: novaMensagem,
         }
 
@@ -88,6 +89,12 @@ export default function ChatPage() {
             .insert([
                 mensagem
             ])
+            .then(({ data }) => {
+                setListaMensagens([
+                    data[0],
+                    ...listaMensagens
+                ])
+            })
 
         setMensagem('')
     }
@@ -120,7 +127,7 @@ export default function ChatPage() {
                 <Header />
 
                 <Box
-                    styleSheet={{ 
+                    styleSheet={{
                         display: 'flex',
                         alignItems: 'center',
                         marginBottom: '5px',
@@ -143,7 +150,15 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-                    <MessageList tema={tema} mensagens={listaMensagens} setListaMensagens={setListaMensagens} loading={loading} />
+                    <MessageList
+                        supabaseClient={supabaseClient}
+                        tema={tema} 
+                        mensagens={listaMensagens}
+                        setListaMensagens={setListaMensagens}
+                        loading={loading}
+                        usuarioLogado={usuarioLogado}
+                        ApagaMensagem={ApagaMensagem}
+                    />
 
                     <Box
                         as="form"

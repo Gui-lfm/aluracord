@@ -1,6 +1,5 @@
 import { Box, Image, Text } from '@skynexui/components'
 import { MdGroup, MdStorage } from 'react-icons/md'
-import appConfig from '../../config.json'
 import { useEffect, useState } from 'react'
 
 export default function UserCard(props) {
